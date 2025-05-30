@@ -6,7 +6,7 @@ from PIL import Image
 import os
 import io
 
-st.set_page_config(page_title="DICOM Viewer with CLAHE & GIF", layout="wide")
+st.set_page_config(page_title="PyDICOM Web", layout="wide")
 st.title("DICOM Viewer with Brightness, Contrast, Filters & GIF Creation")
 
 # --- Upload multiple DICOM files ---
