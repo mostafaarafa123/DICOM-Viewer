@@ -106,7 +106,7 @@ if uploaded_files:
     # Sidebar controls
     st.sidebar.header("Controls")
     slice_num = st.sidebar.slider("Slice Number", 0, len(dcm_files)-1, 0)
-    brightness = st.sidebar.slider("Brigh tness", -100, 100, 0)
+    brightness = st.sidebar.slider("Brightness", -100, 100, 0)
     contrast = st.sidebar.slider("Contrast", 0.1, 3.0, 1.0, 0.1)
     filter_type = st.sidebar.selectbox("Filter", ['None', 'Gaussian', 'Sharpen', 'Edge', 'CLAHE', 'Threshold'])
     zoom = st.sidebar.slider("Zoom", 0.5, 3.0, 1.0, 0.1)
