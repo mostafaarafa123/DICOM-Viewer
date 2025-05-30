@@ -7,7 +7,7 @@ import os
 import io
 
 st.set_page_config(page_title="PyDICOM Web", layout="wide")
-st.title("DICOM Viewer with Brightness, Contrast, Filters & GIF Creation")
+st.title("Viewer with Brightness, Contrast, Filters & GIF Creation")
 
 # --- Upload multiple DICOM files ---
 uploaded_files = st.file_uploader("Upload multiple DICOM (.dcm) files", type="dcm", accept_multiple_files=True)
