@@ -104,14 +104,15 @@ if uploaded_files:
     st.success(f"Loaded {len(dcm_files)} DICOM slices")
 
     # Sidebar controls
-    st.sidebar.header("Controls")
-    slice_num = st.sidebar.slider("Slice Number", 0, len(dcm_files)-1, 0)
-    brightness = st.sidebar.slider("Brightness", -100, 100, 0)
-    contrast = st.sidebar.slider("Contrast", 0.1, 3.0, 1.0, 0.1)
-    filter_type = st.sidebar.selectbox("Filter", ['None', 'Gaussian', 'Sharpen', 'Edge', 'CLAHE', 'Threshold'])
-    zoom = st.sidebar.slider("Zoom", 0.5, 3.0, 1.0, 0.1)
-    st.sidebar.header("You should apply the Threshold filter to do the following order: ")
-    threshold = st.sidebar.slider("Threshold Level", 0, 255, 100)
+    if len(dcm_files) > 0:
+        st.sidebar.header("Controls")
+        slice_num = st.sidebar.slider("Slice Number", 0, len(dcm_files)-1, 0)
+        brightness = st.sidebar.slider("Brightness", -100, 100, 0)
+        contrast = st.sidebar.slider("Contrast", 0.1, 3.0, 1.0, 0.1)
+        filter_type = st.sidebar.selectbox("Filter", ['None', 'Gaussian', 'Sharpen', 'Edge', 'CLAHE', 'Threshold'])
+        zoom = st.sidebar.slider("Zoom", 0.5, 3.0, 1.0, 0.1)
+        st.sidebar.header("You should apply the Threshold filter to do the following order: ")
+        threshold = st.sidebar.slider("Threshold Level", 0, 255, 100)
 
     # Load selected DICOM slice
     try:
