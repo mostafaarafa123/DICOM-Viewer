@@ -158,4 +158,4 @@ if uploaded_files:
 
 else:
     # Show this message if no DICOM files have been uploaded yet
-    st.info("Upload multiple DICOM (.dcm) files to begin.")
+    st.info("Upload    multiple DICOM (.dcm) files to begin.")
