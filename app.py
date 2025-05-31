@@ -1,10 +1,10 @@
-import streamlit as st# Streamlit for creating web app interface
-import pydicom# Library to handle DICOM files
-import numpy as np# Library to handle DICOM files
-import cv2# OpenCV for image processing
-from PIL import Image# Pillow for image manipulation and saving as GIF
-import os# File system operations
-import io# To create byte stream for GIFs
+import streamlit as st  # Streamlit for creating web app interface
+import pydicom  # Library to handle DICOM files
+import numpy as np  # Library to handle DICOM files
+import cv2  # OpenCV for image processing
+from PIL import Image  # Pillow for image manipulation and saving as GIF
+import os  # File system operations
+import io  # To create byte stream for GIFs
 # Configure the Streamlit page layout
 st.set_page_config(page_title="PyDICOM Web", layout="wide")
 st.title("DICOM Viewer with Brightness, Contrast, Filters & GIF Creation")
@@ -100,12 +100,23 @@ if uploaded_files:
         except:
             # If both sorting methods fail, warn the user and keep the original order
             st.warning("Warning: Using default file order")
+
+    # *** ADD SEARCH BAR AND FILTERING HERE ***
+    search_query = st.sidebar.text_input("Search slice by filename or keyword")
+
+    if search_query:
+        filtered_files = [f for f in dcm_files if search_query.lower() in f.lower()]
+        if not filtered_files:
+            st.warning(f"No files match the search: '{search_query}'")
+    else:
+        filtered_files = dcm_files
+
     # Notify the user that the DICOM slices have been loaded successfully
-    st.success(f"Loaded {len(dcm_files)} DICOM slices")
+    st.success(f"Loaded {len(filtered_files)} DICOM slices")
 
     # Sidebar controls
     st.sidebar.header("Controls")
-    slice_num = st.sidebar.slider("Slice Number", 0, len(dcm_files)-1, 0)
+    slice_num = st.sidebar.slider("Slice Number", 0, len(filtered_files)-1, 0)
     brightness = st.sidebar.slider("Brightness", -100, 100, 0)
     contrast = st.sidebar.slider("Contrast", 0.1, 3.0, 1.0, 0.1)
     filter_type = st.sidebar.selectbox("Filter", ['None', 'Gaussian', 'Sharpen', 'Edge', 'CLAHE', 'Threshold'])
@@ -115,7 +126,7 @@ if uploaded_files:
 
     # Load selected DICOM slice
     try:
-        ds = pydicom.dcmread(dcm_files[slice_num])# Read the DICOM file
+        ds = pydicom.dcmread(filtered_files[slice_num])# Read the DICOM file
         img = ds.pixel_array.astype(float)# Extract pixel data from the DICOM dataset and convert it to float for processing
     except Exception as e:
         st.error(f"Failed to load DICOM slice: {e}")
@@ -125,7 +136,7 @@ if uploaded_files:
     img_processed = process_image(img, brightness, contrast, filter_type, threshold, zoom)
 
     # Show image
-    st.image(img_processed, clamp=True, caption=f"Slice {slice_num+1} / {len(dcm_files)}: {dcm_files[slice_num]}")
+    st.image(img_processed, clamp=True, caption=f"Slice {slice_num+1} / {len(filtered_files)}: {filtered_files[slice_num]}")
 
     # Extract and display metadata safely
     metadata = {}
@@ -140,7 +151,7 @@ if uploaded_files:
     # Button to create GIF
     if st.button("Create Slice GIF"):
         # When user clicks the button, generate an animated GIF from all DICOM slices
-        gif_data = create_slice_gif(dcm_files)
+        gif_data = create_slice_gif(filtered_files)
         st.success("GIF created!")
         st.image(gif_data) # Display the generated GIF animation in the app
          # Provide a download button so user can save the GIF locally
