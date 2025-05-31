@@ -47,7 +47,7 @@ def process_image(img, brightness, contrast, filter_type, threshold, zoom):
         h, w = img_processed.shape[:2]
         center_x, center_y = w//2, h//2
         new_w, new_h = int(w/zoom), int(h/zoom)# Calculate the new width and height for zoomed cropping by dividing original dimensions by zoom factor
-        x0, x1 = max(0, center_x-new_w//2), min(w, center_x+new_w//2)  # Calculate the cropping boundaries to keep the crop centered around the image center,
+        x0, x1 = max(0, center_x-new_w//2), min(w, center_x+new_w//2)# Calculate the cropping boundaries to keep the crop centered around the image center,
         y0, y1 = max(0, center_y-new_h//2), min(h, center_y+new_h//2)# ensuring the crop region stays within image bounds (0 to width or height)
         img_processed = img_processed[y0:y1, x0:x1]# Crop
         img_processed = cv2.resize(img_processed, (w, h))# Resize to original size
@@ -104,15 +104,14 @@ if uploaded_files:
     st.success(f"Loaded {len(dcm_files)} DICOM slices")
 
     # Sidebar controls
-    if len(dcm_files) > 0:
-        st.sidebar.header("Controls")
-        slice_num = st.sidebar.slider("Slice Number", 0, len(dcm_files)-1, 0)
-        brightness = st.sidebar.slider("Brightness", -100, 100, 0)
-        contrast = st.sidebar.slider("Contrast", 0.1, 3.0, 1.0, 0.1)
-        filter_type = st.sidebar.selectbox("Filter", ['None', 'Gaussian', 'Sharpen', 'Edge', 'CLAHE', 'Threshold'])
-        zoom = st.sidebar.slider("Zoom", 0.5, 3.0, 1.0, 0.1)
-        st.sidebar.header("You should apply the Threshold filter to do the following order: ")
-        threshold = st.sidebar.slider("Threshold Level", 0, 255, 100)
+    st.sidebar.header("Controls")
+    slice_num = st.sidebar.slider("Slice Number", 0, len(dcm_files)-1, 0)
+    brightness = st.sidebar.slider("Brightness", -100, 100, 0)
+    contrast = st.sidebar.slider("Contrast", 0.1, 3.0, 1.0, 0.1)
+    filter_type = st.sidebar.selectbox("Filter", ['None', 'Gaussian', 'Sharpen', 'Edge', 'CLAHE', 'Threshold'])
+    zoom = st.sidebar.slider("Zoom", 0.5, 3.0, 1.0, 0.1)
+    st.sidebar.header("You should apply the Threshold filter to do the following order:")
+    threshold = st.sidebar.slider("Threshold Level", 0, 255, 100)
 
     # Load selected DICOM slice
     try:
@@ -159,4 +158,4 @@ if uploaded_files:
 
 else:
     # Show this message if no DICOM files have been uploaded yet
-    st.info("Upload    multiple DICOM (.dcm) files to begin.")
+    st.info("Upload multiple DICOM (.dcm) files to begin.")
