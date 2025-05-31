@@ -47,7 +47,7 @@ def process_image(img, brightness, contrast, filter_type, threshold, zoom):
         h, w = img_processed.shape[:2]
         center_x, center_y = w//2, h//2
         new_w, new_h = int(w/zoom), int(h/zoom)# Calculate the new width and height for zoomed cropping by dividing original dimensions by zoom factor
-        x0, x1 = max(0, center_x-new_w//2), min(w, center_x+new_w//2)# Calculate the cropping boundaries to keep the crop centered around the image center,
+        x0, x1 = max(0, center_x-new_w//2), min(w, center_x+new_w//2)  # Calculate the cropping boundaries to keep the crop centered around the image center,
         y0, y1 = max(0, center_y-new_h//2), min(h, center_y+new_h//2)# ensuring the crop region stays within image bounds (0 to width or height)
         img_processed = img_processed[y0:y1, x0:x1]# Crop
         img_processed = cv2.resize(img_processed, (w, h))# Resize to original size
