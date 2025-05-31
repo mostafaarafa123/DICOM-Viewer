@@ -13,17 +13,19 @@ st.title("DICOM Viewer with Brightness, Contrast, Filters & GIF Creation")
 uploaded_files = st.file_uploader("Upload multiple DICOM (.dcm) files", type="dcm", accept_multiple_files=True)
 
 def apply_clahe(img):
+    """Apply CLAHE on 8-bit grayscale image"""
     img_normalized = (img - img.min()) / (img.max() - img.min())
     img_8bit = np.uint8(img_normalized * 255)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     return clahe.apply(img_8bit)
 
 def process_image(img, brightness, contrast, filter_type, threshold, zoom):
+    """Image processing pipeline"""
     img_normalized = (img - img.min()) / (img.max() - img.min())
-    img_processed = np.clip(img_normalized * contrast + (brightness/100), 0, 1)
+    img_processed = np.clip(img_normalized * contrast + (brightness / 100), 0, 1)
 
     if filter_type == 'Gaussian':
-        img_processed = cv2.GaussianBlur(img_processed, (5,5), 0)
+        img_processed = cv2.GaussianBlur(img_processed, (5, 5), 0)
     elif filter_type == 'Sharpen':
         kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
         img_processed = cv2.filter2D(img_processed, -1, kernel)
@@ -39,10 +41,10 @@ def process_image(img, brightness, contrast, filter_type, threshold, zoom):
 
     if zoom != 1.0:
         h, w = img_processed.shape[:2]
-        center_x, center_y = w//2, h//2
-        new_w, new_h = int(w/zoom), int(h/zoom)
-        x0, x1 = max(0, center_x-new_w//2), min(w, center_x+new_w//2)
-        y0, y1 = max(0, center_y-new_h//2), min(h, center_y+new_h//2)
+        center_x, center_y = w // 2, h // 2
+        new_w, new_h = int(w / zoom), int(h / zoom)
+        x0, x1 = max(0, center_x - new_w // 2), min(w, center_x + new_w // 2)
+        y0, y1 = max(0, center_y - new_h // 2), min(h, center_y + new_h // 2)
         img_processed = img_processed[y0:y1, x0:x1]
         img_processed = cv2.resize(img_processed, (w, h))
 
@@ -69,16 +71,19 @@ def safe_str(value):
         return "Unknown"
 
 if uploaded_files:
+    # Store uploaded files in memory
     temp_files = {}
     for file in uploaded_files:
         temp_files[file.name] = file.read()
 
+    # Save to disk temporarily
     for filename, content in temp_files.items():
         with open(filename, "wb") as f:
             f.write(content)
 
     dcm_files = list(temp_files.keys())
 
+    # Sort by InstanceNumber or SliceLocation
     try:
         dcm_files.sort(key=lambda f: pydicom.dcmread(f).InstanceNumber)
     except:
@@ -87,14 +92,11 @@ if uploaded_files:
         except:
             st.warning("Warning: Using default file order")
 
-    if len(dcm_files) == 0:
-        st.error("No valid DICOM files found.")
-        st.stop()
-
     st.success(f"Loaded {len(dcm_files)} DICOM slices")
 
+    # Sidebar controls
     st.sidebar.header("Controls")
-    slice_num = st.sidebar.slider("Slice Number", 0, len(dcm_files)-1, 0)
+    slice_num = st.sidebar.slider("Slice Number", 0, max(0, len(dcm_files) - 1), 0)
     brightness = st.sidebar.slider("Brightness", -100, 100, 0)
     contrast = st.sidebar.slider("Contrast", 0.1, 3.0, 1.0, 0.1)
     filter_type = st.sidebar.selectbox("Filter", ['None', 'Gaussian', 'Sharpen', 'Edge', 'CLAHE', 'Threshold'])
@@ -109,7 +111,7 @@ if uploaded_files:
         st.stop()
 
     img_processed = process_image(img, brightness, contrast, filter_type, threshold, zoom)
-    st.image(img_processed, clamp=True, caption=f"Slice {slice_num+1} / {len(dcm_files)}: {dcm_files[slice_num]}")
+    st.image(img_processed, clamp=True, caption=f"Slice {slice_num + 1} / {len(dcm_files)}: {dcm_files[slice_num]}")
 
     metadata = {}
     for tag in ['PatientName', 'PatientID', 'StudyDate', 'Modality', 'SliceThickness', 'PixelSpacing']:
@@ -123,15 +125,12 @@ if uploaded_files:
         gif_data = create_slice_gif(dcm_files)
         st.success("GIF created!")
         st.image(gif_data)
-        st.download_button(
-            label="Download GIF",
-            data=gif_data,
-            file_name="dicom_slices.gif",
-            mime="image/gif"
-        )
+        st.download_button("Download GIF", data=gif_data, file_name="dicom_slices.gif", mime="image/gif")
 
+    # Cleanup temp files
     for filename in dcm_files:
         if os.path.exists(filename):
             os.remove(filename)
+
 else:
     st.info("Upload multiple DICOM (.dcm) files to begin.")
